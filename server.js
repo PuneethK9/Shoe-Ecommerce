@@ -45,7 +45,7 @@ let nice="";
         
         try{
             const shoe = await Product.findOne({_id:uni});
-            const many = await Product.find({Brand:shoe.Brand});
+            const many = await Product.find({Brand:shoe.Brand,_id:{$ne:uni}});
             res.render("desc",{item:shoe,Data:many});
         }
         catch(err){
