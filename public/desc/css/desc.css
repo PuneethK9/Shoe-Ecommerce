@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
+
+*{
+    margin: 0 0;
+    padding: 0 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+:root{
+    --border: #aaaaaa;
+    --white: #ffffff;
+    --blk: #000000;
+}
+
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96%;
+    padding: 1% 2%;
+    height: 100px;
+    margin-bottom: 15px;
+}
+
+
+#nav{
+    display: flex;
+    justify-content: space-evenly;
+    width: 600px;
+}
+
+
+footer{
+    background-color: var(--blk);
+    width: 100%;
+    height: 300px;
+}
+
+#sizes{
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+label
+{
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+h1{
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+h2{
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 20px 5px;
+}
+
+
+#navicons{
+    font-weight: 600;
+}
+
+
+#main{
+    width: 100%;
+    height: 1250px;
+}
+
+#desc{
+    background-color: white;
+    width: 94%;
+    height: 51%;
+    display: flex;
+    padding: 2% 3%;
+}
+
+#photo{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#dets{
+    width: 44%;
+    height: 93%;
+    padding: 2% 3%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+#dets > *{
+    display: flex;
+    margin: 8px 2px;
+    align-items: center;
+}
+
+#mainimg{
+    height: 90%;
+    width: 70%;
+    border-radius: 25px;
+}
+
+#name{
+    font-weight: 400;
+    font-size: 2rem;
+}
+
+button{
+    width: 200px;
+    height: 55px;
+    border-radius: 15px;
+    margin: 0px 2px;
+    border: 1px solid #aaaaaa;
+}
+
+#addtocart{
+    background-color: #000000;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+#favorite{
+    background-color: #ffffff;
+    color: black;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+p{
+    word-wrap: break-word;
+    width: 100%;
+    font-size: 1.2rem;
+}
+
+input{
+    outline: none;
+    height: 25px;
+    width: 100px;
+    padding: 5px 10px;
+    border: 1px solid #aaaaaa;
+    margin: 0px 10px;
+    font-size: 1.1rem;
+}
+
+#text{
+    font-size: 1.4rem;
+}
+
+button:hover{
+    cursor: pointer;
+    width: 215px;
+}
+
+#items{
+    width: 94%;
+    height: 40%;
+    padding: 2% 3%;
+}
+#head{
+    height: 10%;
+}
+#stems{
+    height: 84%;
+    width: 97%;
+    padding: 15px 15px;
+    display: flex;
+    overflow-x: auto;
+}
+
+#shoes{
+    width: 250px;
+    min-width: 250px;
+    height: 350px;
+    margin: 10px 15px;
+    flex-direction: column;
+}
+
+img{
+    height: 90%;
+    width: 100%;
+}
+
+#shp{
+    font-size: 1rem;
+}
+
+#sums:hover{
+    cursor: pointer;
+}

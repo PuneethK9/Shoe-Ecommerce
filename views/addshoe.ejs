@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/addshoe.css">
+    
+</head>
+<body>
+    <div id="content">
+
+        <form action="/add" method="post">
+            <div id="con_form">
+
+                <div>
+                    <label>Name</label><br>
+                    <input type="text" name="Name"><br>
+                </div>
+                
+                <div>
+                    <label>Brand</label><br>
+                    <input type="text" name="Brand"><br>
+                </div>
+
+                <div>
+                    <label>Category</label><br>
+                    <input type="text" name="Category"><br>
+                </div>
+
+                <div>
+                    <label>Size</label><br>
+                    <input type="number" min="1" max="15" name="Size"><br>
+                </div>
+
+                <div>
+                    <label>Price</label><br>
+                    <input type="number" min="0" name="Price"><br>
+                </div>
+
+                <div>
+                    <label>Stock</label><br>
+                    <input type="number" min="1" name="Stock"><br><br>
+                </div>
+
+                <div>
+                    <label>Description</label><br>
+                    <textarea name="Description"></textarea>
+                </div>
+
+                <div>
+                    <label>Image Url</label><br>
+                    <input id="url" type="text" name="Image"><br>
+                </div>
+
+                <button id="btn" type="submit">ADD PRODUCT</button>
+            </div>
+        </form>
+
+
+    </div>
+    
+</body>
+</html>

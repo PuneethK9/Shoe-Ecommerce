@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+:root
+{
+    --backcol:#7071E8;
+    --formcol: #ffffff;
+}
+
+body{
+    background-color: var(--backcol);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+*{
+    margin: 0 0;
+    padding: 0 0;
+}
+
+#content
+{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#con_form
+{
+    background-color: var(--formcol);
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    width: 60vw;
+    justify-content: space-between;
+    padding: 2em 4em;
+    gap: 5px;
+    border-radius: 20px;
+}
+
+#con_form > *{
+    margin: 0.5em 0.5em;
+}
+
+input
+{
+    height: 2rem;
+    width: 16rem;
+    margin: 2px;
+    border: 2px solid gainsboro;
+    border-radius: 10px;
+    outline: none;
+    padding: 2px 12px;
+    font-size: 1rem;
+}
+
+form{
+    display: flex;
+}
+
+textarea
+{
+    height: 6rem;
+    width: 39vw;
+    margin: 0.5em;
+    border: 2px solid gainsboro;
+    border-radius: 10px;
+    outline: none;
+    resize: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+}
+
+label
+{
+    font-family: 'Poppins', sans-serif;
+    margin: 0.5em;
+}
+
+#btn
+{
+    color: var(--formcol);
+    background-color: var(--backcol);
+    border: 1px solid gainsboro;
+    padding: 1.5em 1em;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+#url
+{
+    width: 40vw;
+}
+
+#btn:hover
+{
+    padding: calc(1.5em + 1px);
+    cursor: pointer;
+}
+
+
+
+@media (max-width: 740px) 
+{
+    input{
+        width: 13rem;
+    }
+}
+
+@media (max-width: 605px) 
+{
+    input{
+        width: 10rem;
+    }
+}
+
+@media (max-width: 1100px) 
+{
+    #con_form{
+        width: 65vw;
+    }
+}
+
+@media (max-width: 940px) 
+{
+    #con_form{
+        width: 70vw;
+    }
+}
+
+@media (max-width: 872px) 
+{
+    #con_form{
+        width: 75vw;
+    }
+}
+
+@media (max-width: 814px) 
+{
+    #con_form{
+        width: 80vw;
+    }
+}
+
+@media (max-width: 764px) 
+{
+    #con_form{
+        width: 85vw;
+        padding: 1em 2em;
+        gap: 3px;
+    }
+}
+
+@media (max-width: 491px) 
+{
+    #con_form{
+        width: 90vw;
+        padding: 1em 1em;
+        gap: 3px;
+        height: 100vh;
+        overflow-y: scroll;
+    }
+}
+
+
