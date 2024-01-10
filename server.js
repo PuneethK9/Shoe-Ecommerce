@@ -51,7 +51,6 @@ let nice="";
         catch(err){
             console.log(err);
         }
-        
     })
 
     app.get("/store",async function(req,res){
