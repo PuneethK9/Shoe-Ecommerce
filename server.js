@@ -1,6 +1,10 @@
 const express=require("express");
 const mongoose=require("mongoose");
 const bodyParser=require("body-parser");
+const jwt=require("jsonwebtoken");
+const cookieparser=require("cookie-parser");
+const { ObjectId }=require("mongodb");
+const flash=require("connect-flash");
 const ejs=require("ejs");
 
 const app=express();
@@ -9,9 +13,12 @@ app.use(express.static("public"));
 app.use(bodyParser.json())
 app.set('view engine','ejs');
 
+app.use(cookieparser());
 app.use(bodyParser.urlencoded({extended:true}));
 
 mongoose.connect("mongodb://localhost:27017/shoes");
+
+const jwtkey = "secret";
 
 const shoeschema={
     Name:String,
@@ -39,7 +46,39 @@ const User=mongoose.model("User",userschema);
 let tmp=[];
 let nice="";
 
-    app.get("/desc/:id",async function(req,res){
+const activesessions = new Map();
+
+    function checktoken(req,res,next){
+
+        const token = req.cookies.token;
+
+        if(token===undefined)
+        {   
+            res.redirect("/login");
+        }
+
+        jwt.verify(token,jwtkey,function(err,user){
+            if(err){
+                console.log(err);
+                return res.redirect("/login");
+            }
+            req.user=user;
+            next();
+        })
+    }
+
+    app.get("/home",checktoken,async function(req,res){
+        const userid = req.user.userid;
+        try{
+            const found = await User.findOne({_id:userid});
+            res.render("home",{user:found});
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.get("/desc/:id",checktoken,async function(req,res){
 
         const uni = req.params.id;
         
@@ -53,7 +92,7 @@ let nice="";
         }
     })
 
-    app.get("/store",async function(req,res){
+    app.get("/store",checktoken,async function(req,res){
         try{
             const shoes = await Product.find({});
             res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice});
@@ -117,10 +156,14 @@ let nice="";
 
         try{
             const found = await User.findOne({Email:useremail})
-            if(found && found.Password === userpassword){
-                res.status(200).send("Access Granted");
+            if(found && found.Password === userpassword)
+            {
+                const token = jwt.sign({userid:found._id,username:found.Firstname},jwtkey,{expiresIn:"1h"});
+                res.cookie("token",token,{httpOnly:true});
+                res.redirect("/home");
             }
-            else{
+            else
+            {
                 res.status(500).send("Error Finding User");
                 console.log(found);
                 console.log(found.Password);
@@ -157,7 +200,7 @@ let nice="";
     })
 
     
-    app.post("/store",async function(req,res){
+    app.post("/store",checktoken,async function(req,res){
 
         try{
             const cats = req.body.Category;
