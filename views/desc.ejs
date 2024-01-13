@@ -21,10 +21,9 @@
                 <div><h2 id="navicons">Men</h2></div>
                 <div><h2 id="navicons">Women</h2></div>
                 <div><h2 id="navicons">Kids</h2></div>
-                <div><h2><span id="sizes" class="material-symbols-outlined">favorite</span></h2></div>
+                <div><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
                 <div><h2><span id="sizes" class="material-symbols-outlined">shopping_cart</span></h2></div>
                 <div><h2><span id="sizes" class="material-symbols-outlined">account_circle</span></h2></div>
-
             </div>
 
         </header>
@@ -42,8 +41,16 @@
                     <div id="price"><div id="text">MRP : &#8377;<%=item.Price%></div></div>
                     <div id="size"><div id="text">Size :</div><input type="number" min="1" max="15"></div>
                     
-                    <div id="cart"><button type="submit" id="addtocart">Add to Cart</button></div>
-                    <div id="favs"><button type="submit" id="favorite">Favourite</button></div>
+                    <div id="cart">
+                        <form method="post" action="/cart?_method=put">
+                            <button name="shoe" type="submit" id="addtocart" value=<%=item.id%>>Add to Cart</button>
+                        </form>
+                    </div>
+                    <div id="favs">
+                        <form method="post" action="/favs?_method=put">
+                            <button name="shoe" type="submit" id="favourite" value=<%=item.id%>>Favourite</button>
+                        </form>
+                    </div>
                     <div id="data">
                         <p><%=item.Description%></p>
                     </div>
@@ -54,8 +61,6 @@
             <div id="items">
                 <div id="head"><h1>You Might Also Like</h1></div>
                 <div id="stems">
-                 
-
                     <%Data.forEach(function(i){%>
                         <div id="shoes">
                             <a href="/desc/<%=i.id%>"><img id="sums" src=<%=i.Image%>></a>
@@ -63,8 +68,6 @@
                             <p id="shp">MRP : &#8377;<%=i.Price%></p>
                         </div>
                     <%})%>
-                    
-                    
                 </div>
 
             </div>

@@ -5,6 +5,7 @@ const jwt=require("jsonwebtoken");
 const cookieparser=require("cookie-parser");
 const { ObjectId }=require("mongodb");
 const flash=require("connect-flash");
+const methodoverride=require("method-override");
 const ejs=require("ejs");
 
 const app=express();
@@ -12,7 +13,7 @@ const app=express();
 app.use(express.static("public"));
 app.use(bodyParser.json())
 app.set('view engine','ejs');
-
+app.use(methodoverride("_method"));
 app.use(cookieparser());
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -38,7 +39,8 @@ const userschema={
     Gender:String,
     Email:String,
     Address:String,
-    Password:String
+    Password:String,
+    Favourites:[{Productname:String,Productid:ObjectId}]
 }
 
 const Product=mongoose.model("Product",shoeschema);
@@ -72,6 +74,25 @@ const activesessions = new Map();
         try{
             const found = await User.findOne({_id:userid});
             res.render("home",{user:found});
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.get("/favs",checktoken,async function(req,res){
+        const userid =req.user.userid;
+        try{
+
+            const Data =[];
+            const favs = await User.findOne({_id:userid},{Favourites:1});
+            const vals = favs.Favourites;
+
+            for(const val of vals){
+                const info = await Product.findOne({_id:val.Productid});
+                Data.push(info);
+            }
+            res.render("favs",{items:Data});
         }
         catch(err){
             console.log(err);
@@ -230,6 +251,32 @@ const activesessions = new Map();
 
         }
         catch (err){
+            console.log(err);
+        }
+    })
+
+    app.put("/favs",checktoken,async function(req,res){
+        const userid = req.user.userid;
+        const shoe = req.body.shoe;
+        try{
+            const shoedets = await Product.findOne({_id:shoe});
+            const result = await User.updateOne({_id:userid},{$push:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
+            res.redirect("/desc/"+shoe);
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.delete("/favs",checktoken,async function(req,res){
+        const userid = req.user.userid;
+        const shoe = req.body.shoe;
+        try{
+            const shoedets = await Product.findOne({_id:shoe});
+            const result = await User.updateOne({_id:userid},{$pull:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
+            res.redirect("/favs");
+        }
+        catch(err){
             console.log(err);
         }
     })
