@@ -36,9 +36,12 @@ header{
     justify-content: space-evenly;
     align-items: center;
     width: 30%;
-    height: 750px;
+    height: 695px;
     overflow-y: scroll;
     flex-wrap: wrap;
+    position: sticky;
+    top: 0px;
+    left: 0px;
 }
 
 #nav{
@@ -168,9 +171,7 @@ input{
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-start;
-    height: 600px;
     padding: 20px 30px;
-    overflow-y: auto;
 }
 
 #shoes > *{
