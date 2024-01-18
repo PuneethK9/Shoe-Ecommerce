@@ -1,0 +1,402 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
+
+*{
+    margin: 0 0;
+    padding: 0 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+:root{
+    --border: #aaaaaa;
+    --white: #ffffff;
+    --blk: #000000;
+}
+
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96%;
+    padding: 1% 2%;
+    height: 70px;
+    margin-bottom: 15px;
+    box-shadow: 0px 3px 10px #aaaaaa;
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    background-color: white;
+    z-index: 1;
+}
+
+#nav{
+    display: flex;
+    justify-content: space-evenly;
+    width: 600px;
+}
+
+footer{
+    background-color: var(--blk);
+    width: 100%;
+    height: 300px;
+}
+
+#sizes{
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+label
+{
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+h1{
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+h2{
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 10px 0px;
+}
+
+#navicons{
+    font-weight: 600;
+}
+
+#hero,#top,#pros,#rev,#bfts{
+    width: 94%;
+    height: 600px;
+    padding: 2% 3%;
+}
+
+#hero{
+    display: flex;
+}
+
+img{
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+}
+
+#cons{
+    height: 96%;
+    width: 44%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2% 3%;
+}
+#photo{
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#btnshop{
+    background-color: black;
+    color: white;
+    height: 60px;
+    width: 200px;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 15px 0px;
+}
+
+#ok{
+    margin: 5px 0px;
+}
+p{
+    margin: 15px 0px;
+}
+
+#top{
+    display: none;
+    height: 1000px;
+    flex-direction: column;
+    align-items: center;
+}
+
+#pho1{
+    width: 44%;
+    height: 93%;
+    padding: 2% 3%;
+    position: relative;
+}
+
+#nike
+{
+    height: 100%;
+}
+#puma{
+    width: 100%;
+}
+
+#pho2{
+    display: flex;
+    flex-direction: column;
+    width: 47%;
+    height: 93%;
+    padding: 2% 3%;
+    padding-left: 0%;
+}
+#pho21{
+    width: 100%;
+    height: 45%;
+    padding-bottom: 5%;
+    position: relative;
+}
+
+#pho22{
+    width: 100%;
+    height: 50%;
+    display: flex;
+}
+
+#pho221{
+    width: 47%;
+    height: 99%;
+    display: flex;
+    padding-right: 3%;
+    padding-top: 1%;
+    position: relative;
+}
+
+#pho222{
+    width: 47%;
+    height: 99%;
+    display: flex;
+    padding-left: 3%;
+    padding-top: 1%;
+    position: relative;
+}
+
+#text{
+    position: absolute;
+    bottom: 40px;
+    left: 60px;
+    color: white;
+}
+#arrow{
+    position: absolute;
+    bottom: 55px;
+    right: 50px;
+    
+    color: white;
+}
+
+#pumatext{
+    position: absolute;
+    bottom: 40px;
+    left: 20px;
+    color: white;
+}
+#pumaarrow{
+    position: absolute;
+    bottom: 55px;
+    right: 10px;
+    color: white;
+}
+#sametext{
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    color: white;
+}
+#samearrow{
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    color: white;
+}
+
+#stick{
+    display: flex;
+    height: 80%;
+}
+
+#title{
+    text-align: center;
+    width: 50%;
+    height: 15%;
+}
+
+#arrowsize{
+    font-size: 3rem;
+}
+#nice{
+    margin: 5px 0px;
+}
+
+#pros{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 1060px;
+}
+
+#products{
+    display: flex;
+    justify-content: center;
+    overflow-y: hidden;
+    height: 71%;
+    width: 94%;
+    padding: 2% 3%;
+    flex-wrap: wrap;
+}
+
+#sums{
+    height: 80%;
+    width: 100%;
+    border-radius: 0px;
+}
+
+#shoes{
+    margin: 15px;
+    height: 350px;
+    width: 250px;
+}
+
+#viewtitle{
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    height: 10%;
+    align-items: center;
+}
+
+#rev{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 700px;
+}
+
+#cus{
+    height: 70%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-y: hidden;
+}
+
+#cusrev{
+    height: 450px;
+    width: 300px;
+    position: relative;
+    margin: 15px;
+}
+
+#adds{
+    background-color: white;
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    height: 46%;
+    width: 80%;
+    padding: 2% 3%;
+    border: 1px solid lightgrey;
+    box-shadow: 3px 3px 5px #aaaaaa;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#new{
+    height: 90%;
+    width: 90%;
+    border-radius: 0px;
+}
+
+#mix{
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+h3{
+    font-weight: 600;
+    padding-bottom: 6px;
+}
+
+#yes{
+    font-size: 2rem;
+}
+
+#custext{
+    width: 100%;
+    overflow-y: hidden;
+    height: 62%;
+}
+
+
+#bfts{
+    height: 550px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#air{
+    
+    height: 81%;
+    width: 94%;
+    padding: 2% 3%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#items{
+    background-color: white;
+    height: 46%;
+    width: 24%;
+    display: flex;
+    padding: 2% 3%;
+    justify-content: space-evenly;
+    border-radius: 15px;
+    box-shadow: 0px 0px 15px 3px lightblue;
+    margin: 15px;
+}
+#bftstext{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 75%;
+}
+#bftsicon{
+    font-weight: 500;
+}
+#carts{
+    color: red;
+    font-size: 3rem;
+    font-weight: 400;
+}
+
+
+#shoes:hover{
+    height: 365px;
+    width: 265px;
+    cursor: pointer;
+    margin: 0px;
+    transition: 1s;
+}
+
+#cusrev:hover{
+    height: 465px;
+    width: 315px;
+    cursor: pointer;
+    margin: 0px;
+    transition: 1s;
+}
+
+a:visited{
+    color: black
+}

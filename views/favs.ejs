@@ -34,7 +34,7 @@
 
                 <%items.forEach(function(i){%>
                     <div id="shoe">
-                        <div id="photo"><img src=<%=i.Image%>></div>
+                        <div id="photo"><a href="/desc/<%=i._id%>"><img src=<%=i.Image%>></a></div>
                         <div id="dets">
                             <div id="moredets">
                                 <p><h2><%=i.Name%></h2></p>

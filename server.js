@@ -72,8 +72,9 @@ const activesessions = new Map();
     app.get("/home",checktoken,async function(req,res){
         const userid = req.user.userid;
         try{
+            const pro = await Product.find({});
             const found = await User.findOne({_id:userid});
-            res.render("home",{user:found});
+            res.render("home",{user:found,Product:pro});
         }
         catch(err){
             console.log(err);
