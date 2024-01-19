@@ -380,6 +380,16 @@ h3{
     font-weight: 400;
 }
 
+#btnshop:hover{
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.8);
+}
+a:visited{
+    color: black;
+}
+a{
+    text-decoration: none;
+}
 
 #shoes:hover{
     height: 365px;

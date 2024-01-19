@@ -18,14 +18,13 @@
             </div>
 
             <div id="nav">
-                <div><h2 id="navicons">Home</h2></div>
-                <div><h2 id="navicons">Men</h2></div>
-                <div><h2 id="navicons">Women</h2></div>
-                <div><h2 id="navicons">Kids</h2></div>
-                <div><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
-                <div><h2><span id="sizes" class="material-symbols-outlined">shopping_cart</span></h2></div>
-                <div><h2><span id="sizes" class="material-symbols-outlined">account_circle</span></h2></div>
-
+                <div id="ihover"><a href="/home"><h2 id="navicons">Home</h2></a></div>
+                <div id="ihover"<%if(hype && hype.includes("Men")){%>style="border-bottom: 3px solid black;"<%}%>><button id="btntype" type="submit" name="Type" value="Men"><h2 id="navicons">Men</h2></button></div>
+                <div id="ihover"<%if(hype && hype.includes("Women")){%>style="border-bottom: 3px solid black;"<%}%>><button id="btntype" type="submit" name="Type" value="Women"><h2 id="navicons">Women</h2></button></div>
+                <div id="ihover"<%if(hype && hype.includes("Kids")){%>style="border-bottom: 3px solid black;"<%}%>><button id="btntype" type="submit" name="Type" value="Kids"><h2 id="navicons">Kids</h2></button></div>
+                <div id="ihover"><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
+                <div id="ihover"><h2><span id="sizes" class="material-symbols-outlined">shopping_cart</span></h2></div>
+                <div id="ihover"><h2><span id="sizes" class="material-symbols-outlined">account_circle</span></h2></div>
             </div>
 
         </header>

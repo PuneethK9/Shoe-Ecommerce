@@ -55,9 +55,16 @@ h1{
 }
 
 h2{
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: 500;
     margin: 20px 5px;
+}
+
+a:visited{
+    color: black;
+}
+a{
+    text-decoration: none;
 }
 
 

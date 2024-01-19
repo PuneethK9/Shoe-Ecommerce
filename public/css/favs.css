@@ -50,6 +50,12 @@ label
     font-size: 1.3rem;
     font-weight: 500;
 }
+a:visited{
+    color: #000000;
+}
+a{
+    text-decoration: none;
+}
 
 h1{
     font-size: 2rem;

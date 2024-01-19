@@ -25,6 +25,7 @@ const shoeschema={
     Name:String,
     Brand:String,
     Category: String,
+    Type:String,
     Size:Number,
     Stock:Number,
     Price:Number,
@@ -47,6 +48,7 @@ const Product=mongoose.model("Product",shoeschema);
 const User=mongoose.model("User",userschema);
 let tmp=[];
 let nice="";
+let deftype="Men";
 
 const activesessions = new Map();
 
@@ -106,7 +108,7 @@ const activesessions = new Map();
         
         try{
             const shoe = await Product.findOne({_id:uni});
-            const many = await Product.find({Brand:shoe.Brand,_id:{$ne:uni}});
+            const many = await Product.find({Brand:shoe.Brand,Type:shoe.Type,_id:{$ne:uni}});
             res.render("desc",{item:shoe,Data:many});
         }
         catch(err){
@@ -114,10 +116,13 @@ const activesessions = new Map();
         }
     })
 
-    app.get("/store",checktoken,async function(req,res){
+    app.get("/store/:Type",checktoken,async function(req,res){
+
+        const ans = req.params.Type;
+        
         try{
-            const shoes = await Product.find({});
-            res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice});
+            const shoes = await Product.find({Type:ans});
+            res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice,hype:ans});
         }
         catch (err){
             console.log(err);
@@ -204,6 +209,7 @@ const activesessions = new Map();
             Name: req.body.Name,
             Brand: req.body.Brand,
             Category: req.body.Category,
+            Type: req.body.Type,
             Size: req.body.Size,
             Stock: req.body.Stock,
             Price: req.body.Price,
@@ -230,6 +236,7 @@ const activesessions = new Map();
             const spiders = req.body.Size;
             const mins = req.body.Minprice;
             const maxs = req.body.Maxprice;
+            const type = req.body.Type;
 
             let query={};
 
@@ -240,6 +247,14 @@ const activesessions = new Map();
             if(spiders)
             query.Size = spiders;
 
+            if(type)
+            {
+                query.Type = type;
+                deftype = type;
+            }
+            else
+            query.Type = deftype;
+
             if(mins && maxs)
             query.Price = {$gte:mins,$lte:maxs};
             else if(mins)
@@ -248,7 +263,7 @@ const activesessions = new Map();
             query.Price = {$lte:maxs};
             
             const shoes = await Product.find(query);
-            res.render("store",{Data:shoes,states:cats,city:birds,streets:spiders});
+            res.render("store",{Data:shoes,states:cats,city:birds,streets:spiders,hype:deftype});
 
         }
         catch (err){
