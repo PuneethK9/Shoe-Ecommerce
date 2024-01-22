@@ -86,16 +86,15 @@ const activesessions = new Map();
     app.get("/favs",checktoken,async function(req,res){
         const userid =req.user.userid;
         try{
-
             const Data =[];
-            const favs = await User.findOne({_id:userid},{Favourites:1});
+            const favs = await User.findOne({_id:userid});
             const vals = favs.Favourites;
 
             for(const val of vals){
                 const info = await Product.findOne({_id:val.Productid});
                 Data.push(info);
             }
-            res.render("favs",{items:Data});
+            res.render("favs",{items:Data,user:favs});
         }
         catch(err){
             console.log(err);
@@ -104,12 +103,14 @@ const activesessions = new Map();
 
     app.get("/desc/:id",checktoken,async function(req,res){
 
+        const use = req.user.userid;
         const uni = req.params.id;
         
         try{
+            const now = await User.findOne({_id:use});
             const shoe = await Product.findOne({_id:uni});
             const many = await Product.find({Brand:shoe.Brand,Type:shoe.Type,_id:{$ne:uni}});
-            res.render("desc",{item:shoe,Data:many});
+            res.render("desc",{item:shoe,Data:many,user:now});
         }
         catch(err){
             console.log(err);
@@ -118,11 +119,13 @@ const activesessions = new Map();
 
     app.get("/store/:Type",checktoken,async function(req,res){
 
+        const use = req.user.userid;
         const ans = req.params.Type;
         
         try{
+            const now = await User.findOne({_id:use});
             const shoes = await Product.find({Type:ans});
-            res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice,hype:ans});
+            res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice,hype:ans,user:now});
         }
         catch (err){
             console.log(err);
@@ -229,7 +232,7 @@ const activesessions = new Map();
 
     
     app.post("/store",checktoken,async function(req,res){
-
+        const use = req.user.userid;
         try{
             const cats = req.body.Category;
             const birds = req.body.Brand;
@@ -262,8 +265,9 @@ const activesessions = new Map();
             else if(maxs)
             query.Price = {$lte:maxs};
             
+            const now = await User.findOne({_id:use});
             const shoes = await Product.find(query);
-            res.render("store",{Data:shoes,states:cats,city:birds,streets:spiders,hype:deftype});
+            res.render("store",{Data:shoes,states:cats,city:birds,streets:spiders,hype:deftype,user:now});
 
         }
         catch (err){

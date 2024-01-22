@@ -24,7 +24,7 @@
                 <div id="ihover"<%if(hype && hype.includes("Kids")){%>style="border-bottom: 3px solid black;"<%}%>><button id="btntype" type="submit" name="Type" value="Kids"><h2 id="navicons">Kids</h2></button></div>
                 <div id="ihover"><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
                 <div id="ihover"><h2><span id="sizes" class="material-symbols-outlined">shopping_cart</span></h2></div>
-                <div id="ihover"><h2><span id="sizes" class="material-symbols-outlined">account_circle</span></h2></div>
+                <div id="ihover"><h2><span id="sizes" class="material-symbols-outlined">account_circle</span><div id="username"><%=user.Firstname%></div></h2></div>
             </div>
 
         </header>
@@ -98,8 +98,8 @@
                         <%Data.forEach(function(item){%>
                             <div id="stems"> 
                                 <a href="/desc/<%=item.id%>"><img src=<%=item.Image%>></a>
-                                <div><h2><span id="sizing" class="material-symbols-outlined">favorite</span></h2></div>
-                                <div><h2><span id="sizings" class="material-symbols-outlined">shopping_bag</span></h2></div>
+                                <div><h2 id="hicon"><span id="sizing" class="material-symbols-outlined">favorite</span></h2></div>
+                                <div><h2 id="hicon"><span id="sizings" class="material-symbols-outlined">shopping_bag</span></h2></div>
                                 <div>
                                     <p><%=item.Name%></p>
                                     <p><%=item.Brand%></p>

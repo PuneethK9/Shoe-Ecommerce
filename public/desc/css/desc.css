@@ -28,7 +28,7 @@ header{
 #nav{
     display: flex;
     justify-content: space-evenly;
-    width: 600px;
+    width: 630px;
 }
 
 
@@ -58,6 +58,8 @@ h2{
     font-size: 1.5rem;
     font-weight: 500;
     margin: 20px 5px;
+    display: flex;
+    align-items: center;
 }
 
 a:visited{
@@ -203,4 +205,9 @@ img{
 
 #sums:hover{
     cursor: pointer;
+}
+
+#username{
+    font-size: 1.3rem;
+    font-weight: 500;
 }
