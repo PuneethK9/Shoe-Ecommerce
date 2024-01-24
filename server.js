@@ -3,7 +3,7 @@ const mongoose=require("mongoose");
 const bodyParser=require("body-parser");
 const jwt=require("jsonwebtoken");
 const cookieparser=require("cookie-parser");
-const { ObjectId }=require("mongodb");
+const { ObjectId, Decimal128 }=require("mongodb");
 const flash=require("connect-flash");
 const methodoverride=require("method-override");
 const ejs=require("ejs");
@@ -21,19 +21,7 @@ mongoose.connect("mongodb://localhost:27017/shoes");
 
 const jwtkey = "secret";
 
-const shoeschema={
-    Name:String,
-    Brand:String,
-    Category: String,
-    Type:String,
-    Size:Number,
-    Stock:Number,
-    Price:Number,
-    Description:String,
-    Image:String
-}
-
-const userschema={
+const userschema = {
     Firstname:String,
     Lastname:String,
     Phonenumber:Number,
@@ -41,18 +29,118 @@ const userschema={
     Email:String,
     Address:String,
     Password:String,
-    Favourites:[{Productname:String,Productid:ObjectId}]
+    Status:Boolean,
+    Favourites:[
+        {   
+            Productname:String,
+            Productid:ObjectId
+        }
+    ],
+    Cart:[
+        {
+            Subamount:Number,
+            Size:Number,
+            Quantityid:ObjectId,
+            Productid:ObjectId,
+            Sellerid:ObjectId
+        }
+    ],
+    Orders:Number
 }
 
-const Product=mongoose.model("Product",shoeschema);
+const sellerschema = {
+    Firstname:String,
+    Lastname:String,
+    Phonenumber:Number,
+    Gender:String,
+    Email:String,
+    Address:String,
+    Password:String,
+    Status:Boolean,
+    Products:Number
+}
+
+const adminschema = {
+    Firstname:String,
+    Lastname:String,
+    Phonenumber:Number,
+    Gender:String,
+    Email:String,
+    Address:String,
+    Password:String
+}
+
+
+const prodcutschema = {
+    Name:String,
+    Brand:String,
+    Category: String,
+    Type:String,
+    Sizes:Number,
+    Description:String,
+    Image:String,
+    Sellerid:ObjectId
+}
+
+const sizeschema = {
+    Size:Number,
+    Mainprice:Number,
+    Viewprice:Number,
+    Quantity:Number,
+    Productid:ObjectId
+}
+
+const quantityschema = {
+    Size:Number,
+    Productid:ObjectId,
+    Sellerid:ObjectId
+}
+
+const orderschema = {
+    Items:Number,
+    Amount:Number,
+    Date:Date,
+    Userid:ObjectId
+}
+
+const itemsschema = {
+    Subamount:Number,
+    Size:Number,
+    Quantityid:ObjectId,
+    Orderid:ObjectId,
+    Userid:ObjectId,
+    Productid:ObjectId,
+    Sellerid:ObjectId
+}
+
+const paymentschema = {
+    Amount:Number,
+    Date:Date,
+    Type:String,
+    Orderid:ObjectId,
+    Userid:ObjectId
+}
+
+
 const User=mongoose.model("User",userschema);
+const Seller=mongoose.model("Seller",sellerschema);
+const Admin=mongoose.model("Admin",adminschema);
+const Product=mongoose.model("Product",prodcutschema);
+const Size=mongoose.model("Size",sizeschema);
+const Quantity=mongoose.model("Quantity",quantityschema);
+const Order=mongoose.model("Order",orderschema);
+const Item=mongoose.model("Item",itemsschema);
+const Payment=mongoose.model("Payment",paymentschema);
+
 let tmp=[];
 let nice="";
 let deftype="Men";
 
 const activesessions = new Map();
 
-    function checktoken(req,res,next){
+    //User InterFace
+
+    function usertoken(req,res,next){
 
         const token = req.cookies.token;
 
@@ -67,11 +155,43 @@ const activesessions = new Map();
                 return res.redirect("/login");
             }
             req.user=user;
-            next();
+
+            if(req.user.role==="User")
+            {
+                if(!req.user.status)
+                return res.send("ACCOUNT BLOCKED!!!");
+                return next();
+            }
+            res.send("UNAUTHORIZED ACCESS");
         })
     }
 
-    app.get("/home",checktoken,async function(req,res){
+    function sellertoken(req,res,next){
+
+        const token = req.cookies.token;
+
+        if(token===undefined)
+        res.redirect("/Slogin");
+
+        jwt.verify(token,jwtkey,function(err,user){
+
+            if(err){
+                console.log(err);
+                return res.redirect("/Slogin");
+            }
+            req.user=user;
+
+            if(req.user.role==="Seller")
+            {
+                if(!req.user.status)
+                return res.send("ACCOUNT BLOCKED!!!");
+                return next();
+            }
+            res.send("UNAUTHORIZED ACCESS");
+        })
+    }
+
+    app.get("/home",usertoken,async function(req,res){
         const userid = req.user.userid;
         try{
             const pro = await Product.find({});
@@ -83,7 +203,7 @@ const activesessions = new Map();
         }
     })
 
-    app.get("/favs",checktoken,async function(req,res){
+    app.get("/favs",usertoken,async function(req,res){
         const userid =req.user.userid;
         try{
             const Data =[];
@@ -101,7 +221,7 @@ const activesessions = new Map();
         }
     })
 
-    app.get("/desc/:id",checktoken,async function(req,res){
+    app.get("/desc/:id",usertoken,async function(req,res){
 
         const use = req.user.userid;
         const uni = req.params.id;
@@ -117,7 +237,7 @@ const activesessions = new Map();
         }
     })
 
-    app.get("/store/:Type",checktoken,async function(req,res){
+    app.get("/store/:Type",usertoken,async function(req,res){
 
         const use = req.user.userid;
         const ans = req.params.Type;
@@ -126,16 +246,6 @@ const activesessions = new Map();
             const now = await User.findOne({_id:use});
             const shoes = await Product.find({Type:ans});
             res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice,hype:ans,user:now});
-        }
-        catch (err){
-            console.log(err);
-        }
-    })
-
-
-    app.get("/add",async function(req,res){
-        try{
-            res.render("addshoe");
         }
         catch (err){
             console.log(err);
@@ -158,7 +268,7 @@ const activesessions = new Map();
         catch (err){
             console.log(err);
         }
-    } )
+    })
 
     app.post("/register",async function(req,res){
         const newuser = new User({
@@ -169,6 +279,8 @@ const activesessions = new Map();
             Email: req.body.Email,
             Address: req.body.Address,
             Password: req.body.Password,
+            Status:true,
+            Orders:0,
         });
 
         try{
@@ -188,7 +300,7 @@ const activesessions = new Map();
             const found = await User.findOne({Email:useremail})
             if(found && found.Password === userpassword)
             {
-                const token = jwt.sign({userid:found._id,username:found.Firstname},jwtkey,{expiresIn:"1h"});
+                const token = jwt.sign({userid:found._id,username:found.Firstname,role:"User",status:found.Status},jwtkey,{expiresIn:"1h"});
                 res.cookie("token",token,{httpOnly:true});
                 res.redirect("/home");
             }
@@ -206,32 +318,7 @@ const activesessions = new Map();
         }
     })
 
-    app.post("/add",async function(req,res){
-        
-        const newpro = new Product({
-            Name: req.body.Name,
-            Brand: req.body.Brand,
-            Category: req.body.Category,
-            Type: req.body.Type,
-            Size: req.body.Size,
-            Stock: req.body.Stock,
-            Price: req.body.Price,
-            Description: req.body.Description,
-            Image: req.body.Image,
-        });
-
-        try{
-            await newpro.save();
-            res.status(200).send("Shoe added successfully");
-        }
-        catch (err){
-            console.log(err);
-            res.status(500).send("Error Creating Shoe");
-        }
-    })
-
-    
-    app.post("/store",checktoken,async function(req,res){
+    app.post("/store",usertoken,async function(req,res){
         const use = req.user.userid;
         try{
             const cats = req.body.Category;
@@ -275,7 +362,7 @@ const activesessions = new Map();
         }
     })
 
-    app.put("/favs",checktoken,async function(req,res){
+    app.put("/favs",usertoken,async function(req,res){
         const userid = req.user.userid;
         const shoe = req.body.shoe;
         try{
@@ -288,13 +375,153 @@ const activesessions = new Map();
         }
     })
 
-    app.delete("/favs",checktoken,async function(req,res){
+    app.delete("/favs",usertoken,async function(req,res){
         const userid = req.user.userid;
         const shoe = req.body.shoe;
         try{
             const shoedets = await Product.findOne({_id:shoe});
             const result = await User.updateOne({_id:userid},{$pull:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
             res.redirect("/favs");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    //Seller InterFace
+
+    app.get("/add",sellertoken,async function(req,res){
+        const userid = req.user.userid;
+        try{
+            res.render("addshoe");
+        }
+        catch (err){
+            console.log(err);
+        }
+    })
+
+    app.get("/Slogin",function(req,res){
+        try{
+            res.render("Slogin");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.get("/Sregister",function(req,res){
+        try{
+            res.render("Sregister");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.post("/Slogin",async function(req,res){
+        const email = req.body.Email;
+        const pass = req.body.Password;
+
+        try{
+            const found = await Seller.findOne({Email:email});
+            if(found && found.Password===pass)
+            {
+                const token = jwt.sign({userid:found._id,username:found.Firstname,role:"Seller",status:found.Status},jwtkey,{expiresIn:"1h"});
+                res.cookie("token",token,{httpOnly:true});
+                res.redirect("/add");  
+            }
+            else
+            {
+                console.log("Error Finding User");
+                console.log(found);
+                console.log(pass);
+            }
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.post("/Sregister",async function(req,res){
+        try{
+            const newseller = new Seller({
+                Firstname:req.body.Firstname,
+                Lastname:req.body.Lastname,
+                Phonenumber:req.body.Phonenumber,
+                Gender:req.body.Gender,
+                Email:req.body.Email,
+                Address:req.body.Address,
+                Password:req.body.Password,
+                Status:true,
+                Products:0,
+            });
+
+            await newseller.save();
+            res.status(200).send("Seller Account Created");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.post("/add",sellertoken,async function(req,res){
+        
+        const newpro = new Product({
+            Name: req.body.Name,
+            Brand: req.body.Brand,
+            Category: req.body.Category,
+            Type: req.body.Type,
+            Size: req.body.Size,
+            Stock: req.body.Stock,
+            Price: req.body.Price,
+            Description: req.body.Description,
+            Image: req.body.Image,
+        });
+
+        try{
+            await newpro.save();
+            res.status(200).send("Shoe added successfully");
+        }
+        catch (err){
+            console.log(err);
+            res.status(500).send("Error Creating Shoe");
+        }
+    })
+
+    //Admin InterFace
+
+    app.get("/Alogin",function(req,res){
+        try{
+            res.render("Alogin");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.get("/Aregister",function(req,res){
+        try{
+            res.render("Aregister");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.post("/Aregister",async function(req,res){
+        try{
+            const newadmin = new Admin({
+                Firstname:req.body.Firstname,
+                Lastname:req.body.Lastname,
+                Phonenumber:req.body.Phonenumber,
+                Gender:req.body.Gender,
+                Email:req.body.Email,
+                Address:req.body.Address,
+                Password:req.body.Password,
+            });
+
+            await newadmin.save();
+            res.status(200).send("Admin Account Created");
         }
         catch(err){
             console.log(err);
