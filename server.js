@@ -465,22 +465,79 @@ const activesessions = new Map();
     })
 
     app.post("/add",sellertoken,async function(req,res){
-        
-        const newpro = new Product({
-            Name: req.body.Name,
-            Brand: req.body.Brand,
-            Category: req.body.Category,
-            Type: req.body.Type,
-            Size: req.body.Size,
-            Stock: req.body.Stock,
-            Price: req.body.Price,
-            Description: req.body.Description,
-            Image: req.body.Image,
-        });
 
+        const sellerid = req.user.userid;
+        const found = await Product.findOne({Sellerid:sellerid,Name:req.body.Name});
+
+        if(found)
+        return res.send("Product Already Present");
+        
         try{
-            await newpro.save();
-            res.status(200).send("Shoe added successfully");
+
+            //PRODUCT INSERT
+
+            const Sellerdata =  await Seller.findOne({_id:sellerid});
+            let val = Sellerdata.Products;
+            const chk = await Product.find({Sellerid:sellerid}).countDocuments();
+
+            if(chk!=val)
+            return console.log("Seller-Product Data Inconsistent");
+
+            const newpro = new Product({
+                Name: req.body.Name,
+                Brand: req.body.Brand,
+                Category: req.body.Category,
+                Type: req.body.Type,
+                Sizes:0,
+                Description: req.body.Description,
+                Image: req.body.Image,
+                Sellerid:sellerid, 
+            });
+            const proid = await newpro.save();
+            await Seller.updateOne({_id:sellerid},{$set:{Products:val+1}});
+
+            //SIZE INSERT
+
+            const prosize = await Product.findOne({_id:proid._id});
+            let newval = prosize.Sizes;
+            const sizechk = await Size.find({Productid:proid._id}).countDocuments();
+
+            if(newval!=sizechk)
+            return console.log("Product-Size Data Inconsistent");
+
+            let vals = req.body.Price;
+            let factor=1.1;
+            vals=Math.round(vals*factor);
+            const newsize = new Size({
+                Size:req.body.Size,
+                Mainprice:req.body.Price,
+                Viewprice:vals,
+                Quantity:0,
+                Productid:proid._id,
+            });
+            const sizeid = await newsize.save();
+            await Product.updateOne({_id:proid._id},{$set:{Sizes:newval+1}});
+
+            //QUANTITY INSERT
+
+            for(let i=0;i<req.body.Stock;i++){
+
+                const qty = await Size.findOne({_id:sizeid._id});
+                let value = qty.Quantity;
+                const qtychk = await Quantity.find({Size:sizeid.Size,Productid:proid._id}).countDocuments();
+
+                if(value!=qtychk)
+                return console.log("Size-Quantity Data Inconsistent");
+
+                const newqty = new Quantity({
+                    Size:req.body.Size,
+                    Productid:proid._id,
+                    Sellerid:sellerid,
+                });
+                await newqty.save();
+                await Size.updateOne({_id:sizeid._id},{$set:{Quantity:value+1}});
+            }
+            res.send("Product Added Successfully");
         }
         catch (err){
             console.log(err);
