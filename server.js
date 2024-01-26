@@ -194,7 +194,16 @@ const activesessions = new Map();
     app.get("/home",usertoken,async function(req,res){
         const userid = req.user.userid;
         try{
-            const pro = await Product.find({});
+            const pro = await Product.aggregate([
+                {
+                    $lookup:{
+                        from:"sizes",
+                        localField:"_id",
+                        foreignField:"Productid",
+                        as:"news"
+                    }
+                }
+            ]);
             const found = await User.findOne({_id:userid});
             res.render("home",{user:found,Product:pro});
         }
@@ -211,8 +220,20 @@ const activesessions = new Map();
             const vals = favs.Favourites;
 
             for(const val of vals){
-                const info = await Product.findOne({_id:val.Productid});
-                Data.push(info);
+                const info = await Product.aggregate([
+                    {
+                        $lookup:{
+                            from:"sizes",
+                            localField:"_id",
+                            foreignField:"Productid",
+                            as:"news"
+                        }
+                    },
+                    {
+                        $match:{_id:val.Productid}
+                    }
+                ]);
+                Data.push(info[0]);
             }
             res.render("favs",{items:Data,user:favs});
         }
@@ -228,9 +249,37 @@ const activesessions = new Map();
         
         try{
             const now = await User.findOne({_id:use});
-            const shoe = await Product.findOne({_id:uni});
-            const many = await Product.find({Brand:shoe.Brand,Type:shoe.Type,_id:{$ne:uni}});
-            res.render("desc",{item:shoe,Data:many,user:now});
+            const shoe = await Product.aggregate([
+                {
+                    $lookup:{
+                        from:"sizes",
+                        localField:"_id",
+                        foreignField:"Productid",
+                        as:"news"
+                    }
+                },
+                {
+                    $match:{_id:new ObjectId(uni)}
+                }
+            ]);
+            const many = await Product.aggregate([
+                {
+                    $lookup:{
+                        from:"sizes",
+                        localField:"_id",
+                        foreignField:"Productid",
+                        as:"news"
+                    }
+                },
+                {
+                    $match:{
+                        Brand:shoe[0].Brand,
+                        Type:shoe[0].Type,
+                        _id:{$ne:new ObjectId(uni)}
+                    }
+                }
+            ]);
+            res.render("desc",{item:shoe[0],Data:many,user:now});
         }
         catch(err){
             console.log(err);
@@ -244,7 +293,19 @@ const activesessions = new Map();
         
         try{
             const now = await User.findOne({_id:use});
-            const shoes = await Product.find({Type:ans});
+            const shoes = await Product.aggregate([
+                {
+                    $lookup:{
+                        from:"sizes",
+                        localField:"_id",
+                        foreignField:"Productid",
+                        as:"news"
+                    }
+                },
+                {
+                    $match:{Type:ans}
+                }
+            ]);
             res.render('store',{Data: shoes,states:tmp,city:tmp,streets:nice,hype:ans,user:now});
         }
         catch (err){
@@ -331,11 +392,11 @@ const activesessions = new Map();
             let query={};
 
             if(cats)
-            query.Category = cats;
+            query.Category = (Array.isArray(cats)? {$in:cats}:cats);
             if(birds)
-            query.Brand = birds;
+            query.Brand = (Array.isArray(birds)? {$in:birds}:birds);
             if(spiders)
-            query.Size = spiders;
+            query.news = {$elemMatch:{Size:Number(spiders)}};
 
             if(type)
             {
@@ -353,7 +414,19 @@ const activesessions = new Map();
             query.Price = {$lte:maxs};
             
             const now = await User.findOne({_id:use});
-            const shoes = await Product.find(query);
+            const shoes = await Product.aggregate([
+                {
+                    $lookup:{
+                        from:"sizes",
+                        localField:"_id",
+                        foreignField:"Productid",
+                        as:"news"
+                    }
+                },
+                {
+                    $match:query
+                }
+            ]);
             res.render("store",{Data:shoes,states:cats,city:birds,streets:spiders,hype:deftype,user:now});
 
         }
@@ -369,6 +442,39 @@ const activesessions = new Map();
             const shoedets = await Product.findOne({_id:shoe});
             const result = await User.updateOne({_id:userid},{$push:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
             res.redirect("/desc/"+shoe);
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.put("/cart",usertoken,async function(req,res){
+        const userid = req.user.userid;
+        const shoe = req.body.shoe;
+        const size = req.body.Size;
+        const qty = req.body.Quantity;
+        try{
+            const proprice = await Size.findOne({Productid:shoe,Size:size});
+
+            if(!proprice)
+            return console.log("SIZE NOT PRESENT");
+
+            const pros = await Quantity.find({Productid:shoe,Size:size});
+            let len = pros.length;
+
+            if(qty>len)
+            return console.log("Quantity Not Sufficient");
+
+            for(let i=0;i<qty;i++)
+            {
+                await User.updateOne({_id:userid},{$push:{Cart:{
+                    Subamount:proprice.Viewprice,
+                    Size:pros[i].Size,
+                    Quantityid:pros[i]._id,
+                    Productid:pros[i].Productid,
+                    Sellerid:pros[i].Sellerid
+                }}});
+            }
         }
         catch(err){
             console.log(err);

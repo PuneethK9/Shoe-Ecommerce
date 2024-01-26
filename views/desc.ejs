@@ -36,20 +36,25 @@
                     <img id="mainimg" src=<%=item.Image%>>
                 </div>
                 <div id="dets">
-                    <div id="name"><%=item.Name%></div>
-                    <div id="brand"><div id="text"><%=item.Brand%></div></div>
-                    <div id="price"><div id="text">MRP : &#8377;<%=item.Price%></div></div>
-                    <div id="size"><div id="text">Size :</div><input type="number" min="1" max="15"></div>
-                    <div id="size"><div id="text">Qty :</div><input type="number" min="1"></div>
-                    
-                    <div id="cart">
-                        <form method="post" action="/cart?_method=put">
-                            <button name="shoe" type="submit" id="addtocart" value=<%=item.id%>>Add to Cart</button>
-                        </form>
-                    </div>
+                    <form id="newform" method="post" action="/cart?_method=put">
+                        <div id="name"><%=item.Name%></div>
+                        <div id="brand"><div id="text"><%=item.Brand%></div></div>
+                        <div id="price"><div id="text">MRP : &#8377;<%=item.news[0].Viewprice%></div></div>
+                        <div id="size">
+                            
+                            <div id="text">Size :</div><input name="Size" type="number" min="1" max="15">
+                        </div>
+                        <div id="size">
+                            <div id="text">Qty :</div><input name="Quantity" type="number" min="1">
+                        </div>
+                        
+                        <div id="cart">
+                            <button name="shoe" type="submit" id="addtocart" value=<%=item._id%>>Add to Cart</button>
+                        </div>
+                    </form>
                     <div id="favs">
                         <form method="post" action="/favs?_method=put">
-                            <button name="shoe" type="submit" id="favourite" value=<%=item.id%>>Favourite</button>
+                            <button name="shoe" type="submit" id="favourite" value=<%=item._id%>>Favourite</button>
                         </form>
                     </div>
                     <div id="data">
@@ -64,9 +69,9 @@
                 <div id="stems">
                     <%Data.forEach(function(i){%>
                         <div id="shoes">
-                            <a href="/desc/<%=i.id%>"><img id="sums" src=<%=i.Image%>></a>
+                            <a href="/desc/<%=i._id%>"><img id="sums" src=<%=i.Image%>></a>
                             <p id="shp"><%=i.Name%></p>
-                            <p id="shp">MRP : &#8377;<%=i.Price%></p>
+                            <p id="shp">MRP : &#8377;<%=i.news[0].Viewprice%></p>
                         </div>
                     <%})%>
                 </div>

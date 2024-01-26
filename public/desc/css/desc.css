@@ -211,3 +211,15 @@ img{
     font-size: 1.3rem;
     font-weight: 500;
 }
+
+#newform{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#newform > *{
+    display: flex;
+    margin: 8px 2px;
+    align-items: center;
+}

@@ -97,13 +97,13 @@
 
                         <%Data.forEach(function(item){%>
                             <div id="stems"> 
-                                <a href="/desc/<%=item.id%>"><img src=<%=item.Image%>></a>
+                                <a href="/desc/<%=item._id%>"><img src=<%=item.Image%>></a>
                                 <div><h2 id="hicon"><span id="sizing" class="material-symbols-outlined">favorite</span></h2></div>
                                 <div><h2 id="hicon"><span id="sizings" class="material-symbols-outlined">shopping_bag</span></h2></div>
                                 <div>
                                     <p><%=item.Name%></p>
                                     <p><%=item.Brand%></p>
-                                    <p>MRP: &#8377; <%=item.Price%></p>
+                                    <p>MRP: &#8377; <%=item.news[0].Viewprice%></p>
                                 </div>
                             </div>
                         <%})%>
