@@ -3,7 +3,7 @@ const mongoose=require("mongoose");
 const bodyParser=require("body-parser");
 const jwt=require("jsonwebtoken");
 const cookieparser=require("cookie-parser");
-const { ObjectId, Decimal128 }=require("mongodb");
+const { ObjectId, Decimal128}=require("mongodb");
 const flash=require("connect-flash");
 const methodoverride=require("method-override");
 const ejs=require("ejs");
@@ -30,22 +30,14 @@ const userschema = {
     Address:String,
     Password:String,
     Status:Boolean,
+    Cart:Number,
+    Orders:Number,
     Favourites:[
         {   
             Productname:String,
             Productid:ObjectId
         }
     ],
-    Cart:[
-        {
-            Subamount:Number,
-            Size:Number,
-            Quantityid:ObjectId,
-            Productid:ObjectId,
-            Sellerid:ObjectId
-        }
-    ],
-    Orders:Number
 }
 
 const sellerschema = {
@@ -91,9 +83,18 @@ const sizeschema = {
 }
 
 const quantityschema = {
-    Size:Number,
+    Sizeid:ObjectId,
     Productid:ObjectId,
     Sellerid:ObjectId
+}
+
+const cartschema = {
+    Subamount:Number,
+    Sizeid:ObjectId,
+    Quantityid:ObjectId,
+    Productid:ObjectId,
+    Sellerid:ObjectId,
+    Userid:ObjectId
 }
 
 const orderschema = {
@@ -105,7 +106,7 @@ const orderschema = {
 
 const itemsschema = {
     Subamount:Number,
-    Size:Number,
+    Sizeid:ObjectId,
     Quantityid:ObjectId,
     Orderid:ObjectId,
     Userid:ObjectId,
@@ -128,6 +129,7 @@ const Admin=mongoose.model("Admin",adminschema);
 const Product=mongoose.model("Product",prodcutschema);
 const Size=mongoose.model("Size",sizeschema);
 const Quantity=mongoose.model("Quantity",quantityschema);
+const Cart=mongoose.model("Cart",cartschema);
 const Order=mongoose.model("Order",orderschema);
 const Item=mongoose.model("Item",itemsschema);
 const Payment=mongoose.model("Payment",paymentschema);
@@ -190,6 +192,59 @@ const activesessions = new Map();
             res.send("UNAUTHORIZED ACCESS");
         })
     }
+
+    app.get("/cart",usertoken,async function(req,res){
+        const userid = req.user.userid;
+        try{
+            const found = await User.findOne({_id:userid});
+            const items = await Cart.aggregate([
+                {
+                    $lookup:
+                    {
+                        from:"sizes",
+                        foreignField:"_id",
+                        localField:"Sizeid",
+                        as:"news"
+                    }
+                },
+                {
+                    $unwind:"$news"
+                },
+                {
+                    $lookup:{
+                        from:"products",
+                        foreignField:"_id",
+                        localField:"Productid",
+                        as:"dets"
+                    }
+                },
+                {
+                    $unwind:"$dets"
+                },
+                {
+                    $match:{Userid:new ObjectId(userid)}
+                },
+                {
+                    $group:
+                    {
+                        _id:
+                        {
+                            Product:"$dets._id",
+                            Size:"$news._id"
+                        },
+                        count:{$sum:1},
+                        Total:{$sum:"$Subamount"},
+                        dets:{$first:"$dets"},
+                        news:{$first:"$news"}
+                    }
+                }
+            ]);
+            res.render("cart",{user:found,cart:items});
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
 
     app.get("/home",usertoken,async function(req,res){
         const userid = req.user.userid;
@@ -342,6 +397,7 @@ const activesessions = new Map();
             Password: req.body.Password,
             Status:true,
             Orders:0,
+            Cart:0,
         });
 
         try{
@@ -435,46 +491,177 @@ const activesessions = new Map();
         }
     })
 
-    app.put("/favs",usertoken,async function(req,res){
-        const userid = req.user.userid;
-        const shoe = req.body.shoe;
-        try{
-            const shoedets = await Product.findOne({_id:shoe});
-            const result = await User.updateOne({_id:userid},{$push:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
-            res.redirect("/desc/"+shoe);
-        }
-        catch(err){
-            console.log(err);
-        }
-    })
-
-    app.put("/cart",usertoken,async function(req,res){
+    app.post("/cart",usertoken,async function(req,res){
         const userid = req.user.userid;
         const shoe = req.body.shoe;
         const size = req.body.Size;
         const qty = req.body.Quantity;
+        const ref = req.headers.referer;
         try{
             const proprice = await Size.findOne({Productid:shoe,Size:size});
 
             if(!proprice)
             return console.log("SIZE NOT PRESENT");
 
-            const pros = await Quantity.find({Productid:shoe,Size:size});
+            const pros = await Quantity.find({Sizeid:proprice._id});
             let len = pros.length;
+        
+            if(!qty)
+            return console.log("Quantity Not defined");
 
             if(qty>len)
             return console.log("Quantity Not Sufficient");
-
-            for(let i=0;i<qty;i++)
+            
+            let val = qty;
+            for(const pro of pros)
             {
-                await User.updateOne({_id:userid},{$push:{Cart:{
-                    Subamount:proprice.Viewprice,
-                    Size:pros[i].Size,
-                    Quantityid:pros[i]._id,
-                    Productid:pros[i].Productid,
-                    Sellerid:pros[i].Sellerid
-                }}});
+                const chk = await Cart.findOne({Quantityid:pro._id,Userid:userid});
+
+                if(!chk)
+                {
+                    const userdata = await User.findOne({_id:userid});
+                    const cartval = userdata.Cart;
+                    const chkval = await Cart.find({Userid:userid}).countDocuments();
+
+                    if(chkval!=cartval)
+                    return console.log("User-Cart Data Inconsistent");
+
+                    const cartitem = new Cart({
+                        Subamount:proprice.Viewprice,
+                        Sizeid:pro.Sizeid,
+                        Quantityid:pro._id,
+                        Productid:pro.Productid,
+                        Sellerid:pro.Sellerid,
+                        Userid:userid,
+                    });
+                    await cartitem.save();
+                    await User.updateOne({_id:userid},{$set:{Cart:cartval+1}});
+
+                    val = val - 1;
+                    if(val==0)
+                    break;
+                }
             }
+        }
+        catch(err){
+            console.log(err);
+        }
+        res.redirect(ref);
+    })
+
+    app.put("/cart",usertoken,async function(req,res){
+        const userid = req.user.userid;
+        const pro = req.body.shoe;
+        const size = req.body.Size;
+        const qty = req.body.qty;
+        try{
+            
+            const tolcartitems = await Cart.find({Userid:userid,Productid:pro,Sizeid:size}).countDocuments();
+
+            let val = qty-tolcartitems;
+
+            if(val==0)
+            return console.log("Error Getting Quantity");
+
+            if(val>0)
+            {
+                const eles = await Quantity.find({Sizeid:size});
+
+                for(const ele of eles)
+                {
+                    const pre = await Cart.findOne({Userid:userid,Quantityid:ele._id});
+
+                    if(!pre)
+                    {
+                        const userdata = await User.findOne({_id:userid});
+                        const chk = userdata.Cart;
+                        const cartitem = await Cart.find({Userid:userid}).countDocuments();
+
+                        const sizep = await Size.findOne({_id:size});
+
+                        if(chk!=cartitem)
+                        return console.log("User-Cart Data Inconsistent");
+
+                        const newcartitem = new Cart({
+                            Subamount:sizep.Viewprice,
+                            Sizeid:ele.Sizeid,
+                            Quantityid:ele._id,
+                            Productid:ele.Productid,
+                            Sellerid:ele.Sellerid,
+                            Userid:userid,
+                        });
+                        await newcartitem.save();
+                        await User.updateOne({_id:userid},{$set:{Cart:chk+1}});
+
+                        val = val -1;
+                        if(val==0)
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                val = val*-1;
+                for(let i=0;i<val;i++)
+                {
+                    const userdata = await User.findOne({_id:userid});
+                    const chk = userdata.Cart;
+                    const itms =await Cart.find({Userid:userid}).countDocuments();
+
+                    if(chk!=itms)
+                    return console.log("User-Cart Data Inconsistent");
+
+                    const see = await Cart.findOne({Userid:userid,Productid:pro,Sizeid:size});
+                    const del = await Cart.deleteOne({_id:see._id});
+
+                    const up = await User.updateOne({_id:userid},{$set:{Cart:chk-1}});
+                }
+            }
+            res.redirect("/cart");
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.put("/favs",usertoken,async function(req,res){
+        const userid = req.user.userid;
+        const shoe = req.body.shoe;
+        const ref = req.headers.referer;
+        try{
+            const shoedets = await Product.findOne({_id:shoe});
+            const result = await User.updateOne({_id:userid},{$push:{Favourites:{Productname:shoedets.Name,Productid:shoedets._id}}});
+            res.redirect(ref);
+        }
+        catch(err){
+            console.log(err);
+        }
+    })
+
+    app.delete("/cart",usertoken,async function(req,res){
+        const userid = req.user.userid;
+        const pro = req.body.product;
+        const size = req.body.Size;
+        try{
+            
+            const qty = await Cart.find({Userid:userid,Productid:pro,Sizeid:size});
+            let sz = qty.length;
+
+            for(let i=0;i<sz;i++)
+            {
+                const userdata = await User.findOne({_id:userid});
+                const chk = userdata.Cart;
+                const cartitem = await Cart.find({Userid:userid}).countDocuments();
+
+                if(chk!=cartitem)
+                return console.log("Cart-User Data Inconsistent");
+                
+                const delitem = await Cart.findOne({Userid:userid,Productid:pro,Sizeid:size});
+                const del = await Cart.deleteOne({_id:delitem._id});
+
+                const up = await User.updateOne({_id:userid},{$set:{Cart:chk-1}});
+            }
+            res.redirect("/cart");
         }
         catch(err){
             console.log(err);
@@ -630,13 +817,13 @@ const activesessions = new Map();
 
                 const qty = await Size.findOne({_id:sizeid._id});
                 let value = qty.Quantity;
-                const qtychk = await Quantity.find({Size:sizeid.Size,Productid:proid._id}).countDocuments();
+                const qtychk = await Quantity.find({Sizeid:sizeid._id}).countDocuments();
 
                 if(value!=qtychk)
                 return console.log("Size-Quantity Data Inconsistent");
 
                 const newqty = new Quantity({
-                    Size:req.body.Size,
+                    Sizeid:sizeid._id,
                     Productid:proid._id,
                     Sellerid:sellerid,
                 });

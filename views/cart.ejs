@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/cart.css" type="text/css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" />
+</head>
+<body>
+    <div id="content">
+
+        <header>
+
+            <div id="icon">
+                <h1><span id="sizes" class="material-symbols-outlined">steps</span>GLAMFEET</h1>
+            </div>
+
+            <div id="nav">
+                <div><a href="/home"><h2 id="navicons">Home</h2></a></div>
+                <div><a href="/store/Men"><h2 id="navicons">Men</h2></a></div>
+                <div><a href="/store/Women"><h2 id="navicons">Women</h2></a></div>
+                <div><a href="/store/Kids"><h2 id="navicons">Kids</h2></a></div>
+                <div><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
+                <div><h2><a href="/cart"><span id="sizes" class="material-symbols-outlined">shopping_cart</span></a></h2></div>
+                <div><h2><span id="sizes" class="material-symbols-outlined">account_circle</span><div id="username"><%=user.Firstname%></div></h2></div>
+            </div>
+
+        </header>
+
+        <div id="main">
+            <div id="cart">
+                <h1 id="head">Cart</h1>
+                <div id="items">
+
+                    <%cart.forEach(function(i){%>
+                        <div id="shoes">
+                            <div id="photo">
+                                <a href="/desc/<%=i.dets._id%>"><img src=<%=i.dets.Image%>></a>
+                            </div>
+                            <div id="sec">
+                                <div id="title">
+                                    <div id="nicetxt"><%=i.dets.Name%></div>
+                                    <div id="nicetxt">MRP : &#8377;<%=i.Total%></div>
+                                </div>
+                                <div id="text"><%=i.dets.Type%>'s Shoes</div>
+                                <div id="text"><%=i.dets.Brand%></div>
+                                <div id="text">Size : <%=i.news.Size%></div>
+                                <div id="text">
+
+                                    <form id="qtyform" method="post" action="/cart?_method=put">
+                                        <input type="hidden" name="shoe" value="<%=i.dets._id%>">
+                                        <input type="hidden" name="Size" value="<%=i.news._id%>">
+                                        Quantity :
+                                        <select id="qty" name="qty" onchange="this.form.submit()">
+                                            <%for(let j=0;j<i.news.Quantity;j++){%>
+                                                <option value="<%=j+1%>"<%if(i.count==j+1){%>selected<%}%>><%=j+1%></option>
+                                            <%}%>    
+                                        </select>
+                                    </form>
+
+                                </div>
+                                <div id="align">
+                                    <div>
+                                        <form method="post" action="\favs?_method=put">
+                                            <button id="none" type="submit" name="shoe" value="<%=i.dets._id%>"><span id="sizesagain" class="material-symbols-outlined">favorite</span></button>
+                                        </form>
+                                    </div>
+                                    <div>
+                                        <form method="post" action="\cart?_method=delete">
+                                            <input type="hidden" name="Size" value="<%=i.news._id%>">
+                                            <button id="none" type="submit" name="product" value="<%=i.dets._id%>"><span id="sizesagain" class="material-symbols-outlined">delete</span></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <%})%>
+
+                </div>
+            </div>
+            <div id="total">
+                <div id="dets">
+                    <h1 id="headno">Summary</h1>
+                    <div id="details">
+                        <div id="title">
+                            <div class="count" id="texts">2 items</div>
+                            <div class="total" id="texts">&#8377; 1111.00</div>
+                        </div>
+                        <div id="title">
+                            <div id="texts">Original Price</div>
+                            <div class="ori" id="texts">&#8377; 19201.00</div>
+                        </div>
+                        <div id="title">
+                            <div id="texts">Delivery</div>
+                            <div id="texts">Free</div>
+                        </div>
+                        <div id="title">
+                            <div id="graytexts">Discount</div>
+                            <div class="dis" id="graytexts">&#8377; -920.00</div>
+                        </div>
+                        <div id="title">
+                            <div id="nicetxts">Total</div>
+                            <div class="gt" id="nicetxts">&#8377; 9201.80</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button id="btn" type="submit">Place Order</button>
+                </div>
+            </div>
+            
+        </div>
+
+        <footer>
+
+        </footer>
+
+    </div>
+
+    <script>
+
+        let data = `<%-JSON.stringify(cart)%>`;
+        data = JSON.parse(data);
+        console.log(data);
+
+        let n = data.length;
+        let con=0,total=0,op=0,disp=0;
+        for(let i=0;i<n;i++)
+        {
+            con+=data[i].count;
+            total+=data[i].Total;
+            op+=data[i].Total*1.1;
+            disp+=data[i].Total*0.1;
+        }
+        
+        const itms = document.getElementsByClassName("count")[0];
+        itms.innerHTML = con +" items";
+
+        const cost = document.getElementsByClassName("total")[0];
+        cost.innerHTML = "&#8377; " + total.toFixed(2);
+
+        const price = document.getElementsByClassName("ori")[0];
+        price.innerHTML = "&#8377; " + op.toFixed(2);
+
+        const dis = document.getElementsByClassName("dis")[0];
+        dis.innerHTML = "&#8377; -" + disp.toFixed(2);
+
+        const gt = document.getElementsByClassName("gt")[0];
+        gt.innerHTML = "&#8377; " + (op-disp).toFixed(2);
+
+        
+        
+
+
+
+    </script>
+</body>
+</html>
+
+    

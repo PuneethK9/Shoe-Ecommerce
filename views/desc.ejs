@@ -22,7 +22,7 @@
                 <div><a href="/store/Women"><h2 id="navicons">Women</h2></a></div>
                 <div><a href="/store/Kids"><h2 id="navicons">Kids</h2></a></div>
                 <div><h2><a href="/favs"><span id="sizes" class="material-symbols-outlined">favorite</span></a></h2></div>
-                <div><h2><span id="sizes" class="material-symbols-outlined">shopping_cart</span></h2></div>
+                <div><h2><a href="/cart"><span id="sizes" class="material-symbols-outlined">shopping_cart</span></a></h2></div>
                 <div><h2><span id="sizes" class="material-symbols-outlined">account_circle</span><div id="username"><%=user.Firstname%></div></h2></div>
             </div>
 
@@ -36,16 +36,16 @@
                     <img id="mainimg" src=<%=item.Image%>>
                 </div>
                 <div id="dets">
-                    <form id="newform" method="post" action="/cart?_method=put">
+                    <form id="newform" method="post" action="/cart">
                         <div id="name"><%=item.Name%></div>
                         <div id="brand"><div id="text"><%=item.Brand%></div></div>
                         <div id="price"><div id="text">MRP : &#8377;<%=item.news[0].Viewprice%></div></div>
                         <div id="size">
                             
-                            <div id="text">Size :</div><input name="Size" type="number" min="1" max="15">
+                            <div id="text">Size :</div><input id="btnsize" name="Size" type="number" min="1" max="15" value="<%=item.news[0].Size%>">
                         </div>
                         <div id="size">
-                            <div id="text">Qty :</div><input name="Quantity" type="number" min="1">
+                            <div id="text">Qty :</div><input name="Quantity" type="number" min="1" value="1">
                         </div>
                         
                         <div id="cart">
@@ -90,7 +90,54 @@
 
     <script>
 
+        const provalues = `<%-JSON.stringify(item)%>`;
+        const sizes = JSON.parse(provalues).news;
+        
+
+        let arr = new Array(16);
+        for(let i=0;i<16;i++){
+            arr[i]=-1;
+        }
+        for(let i=0;i<sizes.length;i++)
+        {
+            arr[sizes[i].Size]=sizes[i].Viewprice;
+        }
+
+        let pre;
+        document.getElementById("btnsize").addEventListener("input",function(){
+            const val = document.getElementById("btnsize").value;
+            const ele = document.querySelectorAll("#text");
+
+            if(!val)
+            {
+                document.getElementById("btnsize").value = pre;
+            }
+            else if(val>15)
+            {
+                document.getElementById("btnsize").value = "15";
+            }
+            else if(arr[val]==-1)
+            {
+                ele[1].innerHTML = "Size Not Available";
+                ele[1].style.color = "red";
+                pre=val;
+            }
+            else
+            {
+                ele[1].innerHTML = "MRP : &#8377;"+arr[val];
+                ele[1].style.color = "black";
+                pre=val;
+            }            
+        })
+        
+
+
+
+
+
+
+
     </script>
     
 </body>
-</ht
+</html>
